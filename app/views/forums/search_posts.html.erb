@@ -1,0 +1,35 @@
+<table class="table">
+  <tr>
+    <th width="300px">User</th>
+    <th>Body</th>
+  </tr>
+  <% @posts.each do |post| %>
+    <tr>
+      <td>
+
+        <p>
+          <b> Nickname:<%= link_to post.user.nickname, post.user %> </b>
+        </p>
+        <div style="line-height: 4pt">
+          <p>
+            Role:
+            <% if post.user.permission_level == 2 %>Admin<%end%>
+            <% if post.user.permission_level == 1 %>Moderator<%end%>
+            <% if post.user.permission_level == 0 %>User<%end%>  </p>
+          <p> Registration date:
+            <%= post.user.created_at.to_formatted_s(:long) %>
+          </p>
+          <p>
+            Posts::
+            <%= post.user.posts.count%>
+          </p>
+        </div>
+      </td>
+      <td>
+        <p><%= post.created_at.to_formatted_s(:short) %></p>
+        <p><%= post.body %> </p>
+
+
+        </tr>
+<% end %>
+</table>

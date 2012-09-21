@@ -1,0 +1,40 @@
+
+<% if @breadcrumbs %>
+    <% @breadcrumbs[0..-2].each do |txt, path| %>
+        <%= link_to(h(txt), path) %> >
+    <% end %>
+    <%= h(@breadcrumbs.last.first) %>
+<% end %>
+
+<br>
+<br>
+
+<table class="table table-bordered">
+  <tr>
+    <th>Forum</th>
+    <th>Topics</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+  <%= form_tag ('/forums/search_posts'), :method => :get do %>
+
+      <p> Search posts </p>
+      <%= text_field_tag :search, params[:search] %>
+      <%= submit_tag "Filter", :class => "btn btn-primary" %>
+
+  <% end %>
+
+<% @forums.each do |forum| %>
+  <tr>
+    <td><h4><%= link_to forum.name, forum_topics_path(forum.id) %></h4>  <small> <%= forum.description %> </small></td>
+    <td><%=forum.topics.count%></td>
+    <% if admin? %> <td><%= link_to 'Edit', edit_forum_path(forum) %></td>
+    <td><%= link_to 'Destroy', forum, method: :delete, data: { confirm: 'Are you sure?' } %></td> <%end%>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<% if admin? %><%= link_to 'New Forum', new_forum_path %><%end%>

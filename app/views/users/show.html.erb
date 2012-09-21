@@ -1,0 +1,29 @@
+<h3> <%=@user.nickname%>'s profile: </h3>
+<br>
+<p>
+<%= image_tag(@user.avatar.thumb.url, :alt => "Avatar", :class => "avatar round") if @user.avatar? %>
+</p>
+<p>
+  <strong>User id</strong>
+  <%= @user.id%>
+</p>
+<p>
+  <strong> Registration date</strong>
+  <%= @user.created_at.to_formatted_s(:long) %>
+</p>
+
+<p>
+  <strong>Nickname</strong>
+  <%= @user.nickname%>
+</p>
+
+<p>
+  <strong>Topics</strong>
+  <%= @user.topics.count%>
+</p>
+
+<p>
+  <strong>Posts</strong>
+  <%= @user.posts.count%>
+</p>
+

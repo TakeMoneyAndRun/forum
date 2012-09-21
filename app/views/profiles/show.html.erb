@@ -1,0 +1,75 @@
+<table class="table">
+<td>
+<h1>Edit user information</h1>
+
+
+<%= form_for current_user, :url => { :action => :update } do |f| %>
+    <% if current_user.errors.any? %>
+        <div class="error_messages">
+          <h2>Form is invalid</h2>
+          <ul>
+            <% for message in current_user.errors.full_messages %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+
+    <p>
+      <%= f.label :nickname %><br />
+      <%= f.text_field :nickname %>
+    </p>
+    <p>
+      <%= f.label :email %><br />
+      <%= f.text_field :email %>
+    </p>
+
+    <p>
+      <%= f.label :avatar%>
+      <%= image_tag(current_user.avatar.thumb.url) if current_user.avatar? %>      <br />
+      <%= f.file_field :avatar %>
+      <%= f.hidden_field :avatar_cache %>
+    </p>
+
+    <p>
+      <strong>Topics</strong>
+      <%= current_user.topics.count%>
+    </p>
+
+    <p>
+      <strong>Posts</strong>
+      <%= current_user.posts.count%>
+    </p>
+
+
+
+
+
+    <p><%= f.submit :class => "btn btn-primary" %></p>
+<% end %>
+    </td>
+    <td>
+      <h1>Change password</h1>
+
+      <%= form_tag :action => 'change_pass'  do %>
+
+
+          <p>
+            <%= label_tag :old_password %><br />
+            <%= password_field_tag :old_password %>
+          </p>
+
+          <p>
+            <%= label_tag :new_password %><br />
+            <%= password_field_tag :new_password %>
+          </p>
+
+          <p>
+            <%= label_tag :new_password_confirmation %><br />
+            <%= password_field_tag :new_password_confirmation %>
+          </p>
+          <p><%= submit_tag "Change password", :class => "btn btn-primary" %></p>
+
+      <% end %>
+    </td>

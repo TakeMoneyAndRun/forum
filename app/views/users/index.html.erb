@@ -1,0 +1,21 @@
+<table class="table">
+  <tr>
+    <th>User id</th>
+    <th>Nickname</th>
+    <th>Permission level</th>
+    <th></th>
+  </tr>
+
+      <% @users.each do |user| %>
+          <tr>
+            <td><%= user.id %></td>
+            <th><%= user.nickname%></th>
+            <th><% if user.permission_level == 2 %>Admin<%end%>
+              <% if user.permission_level == 1 %>Moderator<%end%>
+              <% if user.permission_level == 0 %>User<%end%>    </th>
+            <td><%= link_to 'View profile', :action => :show, :id => user.id %></td>
+            <td><% if  user.permission_level == 0 &&    admin?%><%= link_to 'Promote to moderator', :controller => :admins, :action => :promote, :user => user %><%end%></td>
+            <td><% if  user.permission_level == 1 &&    admin?%><%= link_to 'Demote', :controller => :admins, :action => :demote, :user => user %><%end%></td>
+          </tr>
+      <% end %>
+    </table>
