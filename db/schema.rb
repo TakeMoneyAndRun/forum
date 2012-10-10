@@ -11,7 +11,26 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120920123927) do
+ActiveRecord::Schema.define(:version => 20121004161936) do
+
+  create_table "bans", :force => true do |t|
+    t.text     "reason"
+    t.time     "expires_at"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+    t.integer  "user_id"
+  end
+
+  create_table "bookmarks", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "topic_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+    t.integer  "forum_id"
+  end
+
+  add_index "bookmarks", ["topic_id"], :name => "index_bookmarks_on_topic_id"
+  add_index "bookmarks", ["user_id"], :name => "index_bookmarks_on_user_id"
 
   create_table "forums", :force => true do |t|
     t.string   "name"
@@ -20,12 +39,22 @@ ActiveRecord::Schema.define(:version => 20120920123927) do
     t.datetime "updated_at",  :null => false
   end
 
+  create_table "notes", :force => true do |t|
+    t.integer  "user_id"
+    t.text     "body"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "notes", ["user_id"], :name => "index_notes_on_user_id"
+
   create_table "posts", :force => true do |t|
     t.text     "body"
     t.integer  "topic_id"
     t.integer  "user_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+    t.boolean  "note"
   end
 
   add_index "posts", ["topic_id"], :name => "index_posts_on_topic_id"

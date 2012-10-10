@@ -1,8 +1,8 @@
 class ApplicationController < ActionController::Base
 
 
-
   helper_method :current_user, :admin?, :moderator?, :owner?
+
 
   def admin?
      current_user && current_user.permission_level == 2
@@ -16,11 +16,16 @@ class ApplicationController < ActionController::Base
     current_user && current_user.id == id
   end
 
+
   def counter
- @counter = ActiveRecord::Base.connection.execute("COUNT * FROM sessions")
+    t =  15.minutes.ago
+   @counter = ActiveRecord::Base.connection.execute("SELECT * FROM sessions WHERE(updated_at > '#{t.to_s(:sql)}')").size
+    # и вот тут туплю. сделал вот так, в конце можно и сайз, и каунт. через консоль выдает единичку, а в форуме получиется nil. опять я не знаю чего-то =/
   end
 
+
   protected
+
 
   def add_breadcrumb name, url = ''
     @breadcrumbs ||= []
@@ -37,8 +42,8 @@ class ApplicationController < ActionController::Base
   add_breadcrumb 'Forums', '/'
 
 
-
   private
+
 
   def current_user
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
@@ -57,10 +62,5 @@ class ApplicationController < ActionController::Base
       flash[:error] = 'You dont have access to this page'
     end
   end
-
-
-
-
-
 
 end

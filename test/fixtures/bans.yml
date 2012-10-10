@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  reason: MyText
+  expires_at: 2012-10-04 20:11:06
+
+two:
+  reason: MyText
+  expires_at: 2012-10-04 20:11:06

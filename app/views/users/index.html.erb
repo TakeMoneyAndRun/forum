@@ -14,8 +14,26 @@
               <% if user.permission_level == 1 %>Moderator<%end%>
               <% if user.permission_level == 0 %>User<%end%>    </th>
             <td><%= link_to 'View profile', :action => :show, :id => user.id %></td>
-            <td><% if  user.permission_level == 0 &&    admin?%><%= link_to 'Promote to moderator', :controller => :admins, :action => :promote, :user => user %><%end%></td>
-            <td><% if  user.permission_level == 1 &&    admin?%><%= link_to 'Demote', :controller => :admins, :action => :demote, :user => user %><%end%></td>
+            <td><% if  user.permission_level == 0 &&  admin?%><%= link_to 'Promote to moderator', :controller => :admins, :action => :promote, :user => user %><%end%></td>
+            <td><% if  user.permission_level == 1 &&  admin?%><%= link_to 'Demote', :controller => :admins, :action => :demote, :user => user %><%end%></td>
+            <td><% if  admin? && user.permission_level !=2%>
+                  <%= form_for Ban.new, :url => ban_user_path(user) do |f| %>
+                      <p>
+                        <%= f.label :reason%><br />
+                        <%= f.text_field :reason %>
+                      </p>
+                      <p>
+                        <%=  select_tag "time", options_for_select([["select" , "0" ], ["one day", "1"], ["three days", "3"], ["one week", "7"], ["forever", "500"]]) %>
+                      </p>
+                      <%= f.submit :class => "btn btn-danger" %>
+                  <%end%>
+              <%end%>
+            </td>
+            <td><% if    admin?%>
+                  <%= form_tag  do %>
+                      <%= submit_tag "Unban", :class => "btn btn-success" %>
+                  <%end%>
+              <%end%></td>
           </tr>
       <% end %>
     </table>

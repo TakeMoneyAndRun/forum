@@ -29,18 +29,20 @@ class TopicsController < ApplicationController
     @topic = Topic.find(params[:id])
     @forums = Forum.all
     if params[:search].present?
-      @posts = @topic.posts.where("body LIKE '%#{params[:search]}%'").paginate(:page => params[:page])
+      @posts = @topic.posts.published.where("body LIKE '%#{params[:search]}%'") .paginate(:page => params[:page])
     else
-      @posts = @topic.posts.paginate(:page => params[:page])
+      @posts = @topic.posts.published.paginate(:page => params[:page])
     end
+
     add_breadcrumb @forum.name, 'forum_topics_path(@forum)'
     add_breadcrumb @topic.name, 'forum_topic_path(@forum,@topic)'
+
   end
 
   def edit
     is_user?
     @topic = Topic.find(params[:id])
-    @post = Post.find_by_id(1)
+    @post = @topic.posts.first
     unless owner?(@topic.user.id)
       redirect_to root_url
       flash[:error] = 'You dont have access to this page'

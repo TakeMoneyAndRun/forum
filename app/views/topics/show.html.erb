@@ -16,6 +16,11 @@
         <%= submit_tag "Filter", :class => "btn btn-primary" %>
     <% end %>
   </th>
+    <th>
+      <%= form_tag user_bookmarks_path(current_user, :topic => @topic) do %>
+          <%= submit_tag "Add to bookmarks", :class => "btn btn-primary" %>
+      <%end%>
+    </th>
   </tr>
 </table>
 

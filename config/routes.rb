@@ -1,7 +1,5 @@
 App::Application.routes.draw do
 
-     root :to => 'forums#index'
-
      get "log_out" => "sessions#destroy", :as => "log_out"
      get "log_in" => "sessions#new", :as => "log_in"
      get "sign_up" => "users#new", :as => "sign_up"
@@ -9,19 +7,27 @@ App::Application.routes.draw do
 
 
 
-     post  "topics/close"
-     post  "topics/open"
+      get "forums/search_posts"
 
-     get "forums/search_posts"
-
-     resources :users, :sessions, :admins
+     resources :sessions, :admins
      resource :profile
+
+
+     resources :users do
+       resources :bookmarks, :only => [:create, :destroy]
+       member do
+         post "ban" => :ban
+         post "unban" => :unban
+       end
+     end
 
      resources :forums, :except => :show do
        resources :topics do
          resources :posts
          member do
            post :move
+           post :close
+           post :open
          end
        end
      end
@@ -30,5 +36,7 @@ App::Application.routes.draw do
     get "promote" => :promote
     get "demote"  => :demote
   end
+
+  root :to => 'forums#index'
 
 end

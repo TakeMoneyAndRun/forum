@@ -73,3 +73,23 @@
 
       <% end %>
     </td>
+    <td>
+     My bookmarks:
+      <% current_user.bookmarks.each do |bookmark| %>
+        <p>
+          <%= link_to bookmark.topic.name, forum_topic_path(bookmark.topic.forum,bookmark.topic) %>
+          <%= link_to 'Delete from bookmarks', [current_user,bookmark], :confirm => 'Are you sure?', :method => :delete %>
+        </p>
+      <%end%>
+     <br>
+      <br>
+      <br>
+      My notes:
+      <% @notes.each do |note| %>
+          <p>
+            <%= note.body %>
+
+          </p>
+      <%end%>
+    </td>
+    </table>

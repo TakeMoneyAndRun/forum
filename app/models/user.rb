@@ -1,11 +1,16 @@
 class User < ActiveRecord::Base
+
   mount_uploader :avatar, AvatarUploader
+
   attr_accessible :email, :nickname, :password, :password_confirmation, :permission_level, :avatar, :avatar_cache, :remove_avatar
   attr_accessor :password
+
   before_save :encrypt_password
 
   has_many :posts
   has_many :topics
+  has_many :bookmarks
+  has_many :notes
 
   validates_confirmation_of :password
   validates_presence_of :password, :on => :create
@@ -24,7 +29,6 @@ class User < ActiveRecord::Base
 
   def password_valid?(password)
     password_hash == BCrypt::Engine.hash_secret(password, password_salt)
-
   end
 
 

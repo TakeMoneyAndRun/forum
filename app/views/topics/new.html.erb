@@ -1,5 +1,4 @@
 <h1 id="page_title">New topic</h1>
-<%= link_to @forum.name, @forum %>
 
 <%= form_for(@topic, :url => forum_topics_path) do |f| %>
     <% if @topic.errors.any? %>
