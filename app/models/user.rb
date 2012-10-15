@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   has_many :topics
   has_many :bookmarks
   has_many :notes
+  has_one :ban
 
   validates_confirmation_of :password
   validates_presence_of :password, :on => :create

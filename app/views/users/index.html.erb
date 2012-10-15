@@ -10,13 +10,16 @@
           <tr>
             <td><%= user.id %></td>
             <th><%= user.nickname%></th>
-            <th><% if user.permission_level == 2 %>Admin<%end%>
+            <th>
+              <% if user.permission_level == 2 %>Admin<%end%>
               <% if user.permission_level == 1 %>Moderator<%end%>
-              <% if user.permission_level == 0 %>User<%end%>    </th>
+              <% if user.permission_level == 0 %>User<%end%>
+            </th>
             <td><%= link_to 'View profile', :action => :show, :id => user.id %></td>
             <td><% if  user.permission_level == 0 &&  admin?%><%= link_to 'Promote to moderator', :controller => :admins, :action => :promote, :user => user %><%end%></td>
             <td><% if  user.permission_level == 1 &&  admin?%><%= link_to 'Demote', :controller => :admins, :action => :demote, :user => user %><%end%></td>
-            <td><% if  admin? && user.permission_level !=2%>
+
+            <td><% if  admin? && user.permission_level !=2 && !user.ban%>
                   <%= form_for Ban.new, :url => ban_user_path(user) do |f| %>
                       <p>
                         <%= f.label :reason%><br />
@@ -29,11 +32,18 @@
                   <%end%>
               <%end%>
             </td>
-            <td><% if    admin?%>
-                  <%= form_tag  do %>
+
+            <td>
+              <% if  admin? && user.ban && user.ban.expires_at > DateTime.now.to_date%>
+                  <p>
+                    Banned till <%= user.ban.expires_at %>. Reason : <%= user.ban.reason %>
+                  </p>
+                  <%= form_tag unban_user_path(user) do %>
                       <%= submit_tag "Unban", :class => "btn btn-success" %>
                   <%end%>
-              <%end%></td>
+              <%end%>
+            </td>
+
           </tr>
       <% end %>
     </table>

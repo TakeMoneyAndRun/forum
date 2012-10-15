@@ -7,9 +7,21 @@ class SessionsController < ApplicationController
     user = User.authenticate(params[:email], params[:password])
 
     if user
-      session[:user_id] = user.id
-      redirect_to session[:return_to]
-      session[:return_to] = nil
+      if user.ban.present?
+        if user.ban.expires_at > DateTime.now.to_date
+          flash.now.alert = "You are banned till #{user.ban.expires_at}. Reason: #{user.ban.reason}"
+          render "new"
+        else
+          user.ban.destroy
+          session[:user_id] = user.id
+          redirect_to session[:return_to]
+          session[:return_to] = nil
+        end
+      else
+        session[:user_id] = user.id
+        redirect_to session[:return_to]
+        session[:return_to] = nil
+      end
     else
       flash.now.alert = "Invalid email or password"
       render "new"
