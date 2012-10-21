@@ -17,8 +17,10 @@
     <% end %>
   </th>
     <th>
-      <%= form_tag user_bookmarks_path(current_user, :topic => @topic) do %>
-          <%= submit_tag "Add to bookmarks", :class => "btn btn-primary" %>
+      <% if current_user %>
+         <%= form_tag user_bookmarks_path(current_user, :topic => @topic) do %>
+            <%= submit_tag "Add to bookmarks", :class => "btn btn-primary" %>
+         <%end%>
       <%end%>
     </th>
   </tr>
@@ -58,10 +60,16 @@
         <td>
           <p><%= post.created_at.to_formatted_s(:short) %></p>
           <p><%= post.body %> </p>
-          <% if admin? || moderator? || owner?(post.user.id) %>
-              <%= link_to 'Edit', edit_forum_topic_post_path(@forum,@topic,post) %>
+
+          <% if current_user %>
+              <%= link_to 'Vote', vote_forum_topic_post_path(@forum,@topic,post), method: :post %>
+              <% if !logged?(post.user.id) %>
+                <%= link_to 'Complain', complain_forum_topic_post_path(@forum,@topic,post), method: :post %>
+              <%end%>
           <%end%>
-          <% if admin?%>
+
+          <% if admin? || moderator? || logged?(post.user.id) %>
+              <%= link_to 'Edit', edit_forum_topic_post_path(@forum,@topic,post) %>
               <%= link_to 'Destroy', [@forum,@topic,post], :confirm => 'Are you sure?', :method => :delete %></td>
           <%end%>
       </tr>
@@ -80,7 +88,7 @@
     <% else %>
         <%= link_to 'Reply', log_in_path%>
     <%end%>|
-    <% if  admin? || moderator? || owner?(@topic.user.id) %>
+    <% if  admin? || moderator? ||logged?(@topic.user.id) %>
           <%= link_to 'Close topic', :action => :close,  :forum_id => @forum.id, :id => @topic.id  %>  |
     <% end %>
 

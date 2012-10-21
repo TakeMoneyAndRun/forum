@@ -27,3 +27,8 @@
   <%= @user.posts.count%>
 </p>
 
+<p>
+  <strong>Rating</strong>
+  <%= @user.posts.sum(:rating)%>
+</p>
+

@@ -23,8 +23,7 @@ class UsersController < ApplicationController
   end
 
   def ban
-    is_admin?
-
+    authenticate_admin!
     @ban = Ban.new(params[:ban])
     @ban.expires_at = Time.now() + Integer(params[:time]).days
     @ban.user_id = params[:id]
@@ -37,10 +36,10 @@ class UsersController < ApplicationController
   end
 
   def unban
-   is_admin?
-   @user = User.find(params[:id])
-   @user.ban.destroy
-   redirect_to :back, :notice => "Successfully unbanned"
+    authenticate_admin!
+    @user = User.find(params[:id])
+    @user.ban.destroy
+    redirect_to :back, :notice => "Successfully unbanned"
   end
 
 end

@@ -1,9 +1,10 @@
 class ProfilesController < ApplicationController
 
-  before_filter :is_user?
+  before_filter :authenticate_user!
 
   def show
     @notes = Post.where("user_id = ? AND note = ?" ,current_user.id, true)
+    @posts = Post.complained
   end
 
   def edit
@@ -41,4 +42,5 @@ class ProfilesController < ApplicationController
       flash[:error] = 'Invalid password'
     end
   end
+
 end

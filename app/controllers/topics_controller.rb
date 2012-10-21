@@ -1,23 +1,25 @@
 class TopicsController < ApplicationController
+
+  before_filter :authenticate_user!, :except => [:index, :show]
   before_filter :load_forum, :except => :move
 
+
   def index
-   @topics=@forum.topics
-   add_breadcrumb @forum.name, 'forum_topics_path(@forum)'
- end
+    @topics=@forum.topics
+    add_breadcrumb @forum.name, 'forum_topics_path(@forum)'
+  end
 
   def new
-    is_user?
-    @topic = Topic.new
+    @topic = @forum.topics.build
     @post = @topic.posts.build
   end
 
   def create
-    is_user?
-    @topic = Topic.new(params[:topic])
+    @topic = @forum.topics.build(params[:topic])
     @post = @topic.posts.build(params[:post])
+    @post.note = false
     @topic.user = @post.user = current_user
-    @topic.forum =  @forum
+
     if @topic.save
       redirect_to :action => :index
     else
@@ -26,24 +28,24 @@ class TopicsController < ApplicationController
   end
 
   def show
-    @topic = Topic.find(params[:id])
+    @topic = @forum.topics.find(params[:id])
     @forums = Forum.all
+
     if params[:search].present?
       @posts = @topic.posts.published.where("body LIKE '%#{params[:search]}%'") .paginate(:page => params[:page])
     else
       @posts = @topic.posts.published.paginate(:page => params[:page])
     end
 
-    add_breadcrumb @forum.name, 'forum_topics_path(@forum)'
-    add_breadcrumb @topic.name, 'forum_topic_path(@forum,@topic)'
-
+    add_breadcrumb @forum.name, forum_topics_path(@forum)
+    add_breadcrumb @topic.name, forum_topic_path(@forum,@topic)
   end
 
   def edit
-    is_user?
-    @topic = Topic.find(params[:id])
+    @topic = @forum.topics.find(params[:id])
     @post = @topic.posts.first
-    unless owner?(@topic.user.id)
+
+    unless logged?(@topic.user.id) || admin?
       redirect_to root_url
       flash[:error] = 'You dont have access to this page'
     end
@@ -51,12 +53,13 @@ class TopicsController < ApplicationController
   end
 
   def update
-    is_user?
-    @topic = Topic.find(params[:id])
-    unless owner?(@topic.user.id)
+    @topic = @forum.topics.find(params[:id])
+
+    unless logged?(@topic.user.id) || admin?
       redirect_to root_url
       flash[:error] = 'You dont have access to this page'
     end
+
     if @topic.update_attributes(params[:topic])
       redirect_to :action => :index
     else
@@ -65,45 +68,47 @@ class TopicsController < ApplicationController
   end
 
   def close
-    @topic = Topic.find(params[:id])
+    @topic = @forum.topics.find(params[:id])
     @topic.closed = true
     @topic.save
+
     redirect_to :back, :notice => "Topic is closed"
   end
 
   def open
-    @topic = Topic.find(params[:id])
+    @topic = @forum.topics.find(params[:id])
     @topic.closed = false
     @topic.save
+
     redirect_to :back, :notice => "Topic is opened"
   end
 
-
-
   def destroy
-    is_admin?
-    @topic = Topic.find(params[:id])
-    @topic.destroy
+    @topic = @forum.topics.find(params[:id])
 
-    redirect_to :action => :index
-  end
-
-  def move
-    is_admin?
-    @topic = Topic.find(params[:id])
-    @topic.update_attributes(params[:topic])
-    redirect_to root_url, :notice => "Topic is moved"
-  end
-
-  protected
-
-  def load_forum
-    if Forum.exists?(params[:forum_id])
-    @forum = Forum.find(params[:forum_id])
+    if logged?(@topic.user.id) || moderator? || admin?
+      @topic.destroy
+      redirect_to :action => :index
     else
-      redirect_to(forums_path, :notice =>"Please specify a valid forum")
+      flash[:error] = 'You dont have access to this action'
+      redirect_to :back
     end
   end
 
+  def move
+    authenticate_admin!
+    @topic = Topic.find(params[:id])
+    @topic.update_attributes(params[:topic])
+
+    redirect_to root_url, :notice => "Topic is moved"
+  end
+
+
+  protected
+
+
+  def load_forum
+    @forum = Forum.find(params[:forum_id])
+  end
 
 end

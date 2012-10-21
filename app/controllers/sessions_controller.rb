@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+
   def new
     session[:return_to] = request.referer
   end
@@ -13,14 +14,10 @@ class SessionsController < ApplicationController
           render "new"
         else
           user.ban.destroy
-          session[:user_id] = user.id
-          redirect_to session[:return_to]
-          session[:return_to] = nil
+          new_session(user)
         end
       else
-        session[:user_id] = user.id
-        redirect_to session[:return_to]
-        session[:return_to] = nil
+        new_session(user)
       end
     else
       flash.now.alert = "Invalid email or password"
@@ -32,6 +29,21 @@ class SessionsController < ApplicationController
     session[:user_id] = nil
     redirect_to root_url, :notice => "Logged out!"
   end
+
+  protected
+
+  def new_session(user)
+    session[:user_id] = user.id
+
+    if session[:return_to].present?
+      redirect_to session[:return_to]
+    else
+      redirect_to root_url
+    end
+
+    session[:return_to] = nil
+  end
+
 end
 
 

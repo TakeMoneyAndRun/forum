@@ -28,8 +28,8 @@
           ago by <%= link_to topic.posts.find(:last).user.nickname, topic.posts.find(:last).user  %>
         </td>
         <td><%= topic.posts.count - 1 %></td>
-        <% if admin? || moderator? || owner?(topic.user.id) %><td><%= link_to 'Edit', edit_forum_topic_path(@forum,topic) %></td><%end%>
-        <% if admin?%><td><%= link_to 'Destroy', [@forum,topic], :confirm => 'Are you sure?', :method => :delete %></td><%end%>
+        <% if admin? || moderator? || logged?(topic.user.id) %><td><%= link_to 'Edit', edit_forum_topic_path(@forum,topic) %></td><%end%>
+        <% if admin? || logged?(topic.user.id) %><td><%= link_to 'Destroy', [@forum,topic], :confirm => 'Are you sure?', :method => :delete %></td><%end%>
       </tr>
   <% end %>
 </table>

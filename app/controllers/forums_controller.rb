@@ -1,13 +1,13 @@
 class ForumsController < ApplicationController
 
-  before_filter :is_admin?, :except => [:index, :search_posts]
+  before_filter :authenticate_admin!, :except => [:index, :search_posts]
 
   def index
     @forums = Forum.all
   end
 
   def new
-   @forum = Forum.new
+    @forum = Forum.new
   end
 
   def edit
@@ -16,6 +16,7 @@ class ForumsController < ApplicationController
 
   def create
     @forum = Forum.new(params[:forum])
+
     if @forum.save
       redirect_to :action => :index
     else
@@ -25,6 +26,7 @@ class ForumsController < ApplicationController
 
   def update
     @forum = Forum.find(params[:id])
+
     if @forum.update_attributes(params[:forum])
       redirect_to :action => :index
     else
@@ -35,6 +37,7 @@ class ForumsController < ApplicationController
   def destroy
     @forum = Forum.find(params[:id])
     @forum.destroy
+
     redirect_to :action => :index
   end
 

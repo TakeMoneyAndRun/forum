@@ -42,6 +42,12 @@
       <%= current_user.posts.count%>
     </p>
 
+      <p>
+        <strong>Rating</strong>
+        <%= current_user.posts.sum(:rating)%>
+      </p>
+
+
 
 
 
@@ -92,4 +98,15 @@
           </p>
       <%end%>
     </td>
+    <td>
+      Complained posts:
+    <% @posts.each do |post| %>
+          <p><%= post.id %>
+          <%= post.user.nickname %>
+          <%= post.created_at.to_formatted_s(:short)%>    </p>
+          <p><%= link_to post.body, forum_topic_path(post.topic.forum,post.topic) %> </p>
+          <p><%= link_to 'Hide', hide_forum_topic_post_path(post.topic.forum,post.topic,post), method: :post %></p>
+      <%end%>
+    </td>
+
     </table>

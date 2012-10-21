@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121013094403) do
+ActiveRecord::Schema.define(:version => 20121020134421) do
 
   create_table "bans", :force => true do |t|
     t.text     "reason"
@@ -31,6 +31,17 @@ ActiveRecord::Schema.define(:version => 20121013094403) do
 
   add_index "bookmarks", ["topic_id"], :name => "index_bookmarks_on_topic_id"
   add_index "bookmarks", ["user_id"], :name => "index_bookmarks_on_user_id"
+
+  create_table "complains", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "post_id"
+    t.string   "reason"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "complains", ["post_id"], :name => "index_complains_on_post_id"
+  add_index "complains", ["user_id"], :name => "index_complains_on_user_id"
 
   create_table "forums", :force => true do |t|
     t.string   "name"
@@ -55,6 +66,8 @@ ActiveRecord::Schema.define(:version => 20121013094403) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
     t.boolean  "note"
+    t.integer  "rating"
+    t.boolean  "complained"
   end
 
   add_index "posts", ["topic_id"], :name => "index_posts_on_topic_id"
@@ -91,6 +104,17 @@ ActiveRecord::Schema.define(:version => 20121013094403) do
     t.datetime "updated_at",                      :null => false
     t.integer  "permission_level", :default => 0
     t.string   "avatar"
+    t.integer  "rating"
   end
+
+  create_table "votes", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "post_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "votes", ["post_id"], :name => "index_votes_on_post_id"
+  add_index "votes", ["user_id"], :name => "index_votes_on_user_id"
 
 end
