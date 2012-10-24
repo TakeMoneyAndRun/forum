@@ -1,9 +1,5 @@
 App::Application.routes.draw do
 
-  get "complains/create"
-
-  get "complains/destroy"
-
   post "profiles/change_pass"
   get "forums/search_posts"
 

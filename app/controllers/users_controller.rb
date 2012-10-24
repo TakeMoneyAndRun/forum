@@ -39,6 +39,7 @@ class UsersController < ApplicationController
     authenticate_admin!
     @user = User.find(params[:id])
     @user.ban.destroy
+
     redirect_to :back, :notice => "Successfully unbanned"
   end
 

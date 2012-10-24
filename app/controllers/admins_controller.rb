@@ -20,17 +20,25 @@ class AdminsController < ApplicationController
   def promote
     @user=User.find(params[:user])
     @user.permission_level = 1
-    @user.save
 
-    redirect_to :back, :notice => "Successfully promoted"
+    if @user.save
+      redirect_to :back, :notice => "Successfully promoted"
+    else
+      flash[:error] = "Smth went wrong"
+      redirect_to :back
+    end
   end
 
   def demote
     @user=User.find(params[:user])
     @user.permission_level = 0
-    @user.save
 
-    redirect_to :back, :notice => "Successfully demoted"
+    if @user.save
+      redirect_to :back, :notice => "Successfully demoted"
+    else
+      flash[:error] = "Smth went wrong"
+      redirect_to :back
+    end
   end
 
 end

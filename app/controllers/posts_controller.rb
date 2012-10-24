@@ -38,7 +38,7 @@ class PostsController < ApplicationController
   def edit
     @post = Post.find_by_id(params[:id])
 
-    unless logged?(@post.user.id) || moderator? || admin?
+    unless logged?(@post.user_id) || moderator? || admin?
       flash[:error] = 'You dont have access to this page'
       redirect_to root_url
     end
@@ -51,7 +51,7 @@ class PostsController < ApplicationController
   def update
     @post = Post.find_by_id(params[:id])
 
-    unless logged?(@post.user.id) || moderator? || admin?
+    unless logged?(@post.user_id) || moderator? || admin?
       redirect_to root_url
       flash[:error] = 'You dont have access to this page'
     end
@@ -66,13 +66,14 @@ class PostsController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
 
-    if logged?(@post.user.id) || moderator? || admin?
+    if logged?(@post.user_id) || moderator? || admin?
       @post.body = 'Deleted'
       @post.save
+
       redirect_to forum_topic_path(params[:forum_id], params[:topic_id])
     else
-      redirect_to root_url
       flash[:error] = 'You dont have access to this action'
+      redirect_to root_url
     end
   end
 
@@ -80,7 +81,10 @@ class PostsController < ApplicationController
     # можно вынести в отдельный метод
     @post = Post.find(params[:id])
 
-    unless Vote.where('user_id = ? AND post_id = ?', current_user.id, @post.id).exists?
+    if Post.votes.where(user_id: :current_user.id).exists?
+      flash[:error] = "Sorry, you have already voted"
+      redirect_to :back
+    else
       @post.increment(:rating)
       @post.save
 
@@ -90,27 +94,28 @@ class PostsController < ApplicationController
       @vote.save
 
       redirect_to :back, :notice => "Voted successfully"
-    else
-     flash[:error] = "Sorry, you have already voted"
-     redirect_to :back
     end
   end
 
   def complain
     @post = Post.find(params[:id])
-    unless Complain.where('user_id = ? AND post_id = ?', current_user.id, @post.id).exists?
+
+    if Post.complains.where(user_id: :current_user.id).exists?
+      flash[:error] = "Sorry, you have already complained"
+      redirect_to :back
+    else
       @post.complained = true
-      @post.save
 
       @complain = Complain.new(params[:complain])
       @complain.user = current_user
       @complain.post = @post
-      @complain.save
 
-      redirect_to :back, :notice => "Complained successfully"
-    else
-      flash[:error] = "Sorry, you have already complained"
-      redirect_to :back
+      if @post.save && @complain.save
+        redirect_to :back, :notice => "Complained successfully"
+      else
+        flash[:error] = "Smth went wrong"
+        redirect_to :back
+      end
     end
   end
 
@@ -119,9 +124,14 @@ class PostsController < ApplicationController
 
     @post = Post.find(params[:id])
     @post.complained = false
-    @post.save
 
-    redirect_to :back, :notice => "Hided successfully"
+    if @post.save
+      redirect_to :back, :notice => "Hided successfully"
+    else
+      flash[:error] = "Smth went wrong"
+      redirect_to :back
+    end
+
   end
 
 end

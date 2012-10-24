@@ -21,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   def counter
     t = 255.minutes.ago
-    @counter = Integer(ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM sessions WHERE(updated_at > '#{t.to_s(:sql)}')").to_s.at(14))
+    @counter = ActiveRecord::Base.connection.execute("SELECT COUNT(*) FROM sessions WHERE(updated_at > '#{t.to_s(:sql)}')")[0][0]
   end
 
 
@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
     def add_breadcrumb name, url = ''
       @breadcrumbs ||= []
-      url = eval(url) if url =~ /_path|_url|@/
+      #url = eval(url) if url =~ /_path|_url|@/
       @breadcrumbs << [name, url]
     end
 

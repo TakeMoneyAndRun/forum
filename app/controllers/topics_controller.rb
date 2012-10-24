@@ -6,7 +6,7 @@ class TopicsController < ApplicationController
 
   def index
     @topics=@forum.topics
-    add_breadcrumb @forum.name, 'forum_topics_path(@forum)'
+    add_breadcrumb @forum.name, forum_topics_path(@forum)
   end
 
   def new
@@ -45,9 +45,9 @@ class TopicsController < ApplicationController
     @topic = @forum.topics.find(params[:id])
     @post = @topic.posts.first
 
-    unless logged?(@topic.user.id) || admin?
-      redirect_to root_url
+    unless logged?(@topic.user_id) || admin?
       flash[:error] = 'You dont have access to this page'
+      redirect_to root_url
     end
 
   end
@@ -55,9 +55,9 @@ class TopicsController < ApplicationController
   def update
     @topic = @forum.topics.find(params[:id])
 
-    unless logged?(@topic.user.id) || admin?
-      redirect_to root_url
+    unless logged?(@topic.user_id) || admin?
       flash[:error] = 'You dont have access to this page'
+      redirect_to root_url
     end
 
     if @topic.update_attributes(params[:topic])
@@ -70,23 +70,31 @@ class TopicsController < ApplicationController
   def close
     @topic = @forum.topics.find(params[:id])
     @topic.closed = true
-    @topic.save
 
-    redirect_to :back, :notice => "Topic is closed"
+    if @topic.save
+      redirect_to :back, :notice => "Topic is closed"
+    else
+      flash[:error] = 'Smth went wrong'
+      redirect_to :back
+    end
   end
 
   def open
     @topic = @forum.topics.find(params[:id])
     @topic.closed = false
-    @topic.save
 
-    redirect_to :back, :notice => "Topic is opened"
+    if @topic.save
+      redirect_to :back, :notice => "Topic is opened"
+    else
+      flash[:error] = 'Smth went wrong'
+      redirect_to :back
+    end
   end
 
   def destroy
     @topic = @forum.topics.find(params[:id])
 
-    if logged?(@topic.user.id) || moderator? || admin?
+    if logged?(@topic.user_id) || moderator? || admin?
       @topic.destroy
       redirect_to :action => :index
     else

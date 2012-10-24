@@ -3,8 +3,8 @@ class ProfilesController < ApplicationController
   before_filter :authenticate_user!
 
   def show
-    @notes = Post.where("user_id = ? AND note = ?" ,current_user.id, true)
-    @posts = Post.complained
+    @notes = Post.unpublished
+    @complains = Post.complained
   end
 
   def edit

@@ -100,7 +100,7 @@
     </td>
     <td>
       Complained posts:
-    <% @posts.each do |post| %>
+    <% @complains.each do |post| %>
           <p><%= post.id %>
           <%= post.user.nickname %>
           <%= post.created_at.to_formatted_s(:short)%>    </p>
