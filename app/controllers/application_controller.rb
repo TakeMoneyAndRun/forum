@@ -1,22 +1,7 @@
 class ApplicationController < ActionController::Base
 
 
-  helper_method :current_user, :admin?, :moderator?, :logged?, :counter
-
-  before_filter :check_banned
-
-
-  def admin?
-    current_user && current_user.permission_level == 2
-  end
-
-  def moderator?
-    current_user && current_user.permission_level == 1
-  end
-
-  def logged?(id)
-    current_user && current_user.id == id
-  end
+  helper_method :counter
 
 
   def counter
@@ -53,22 +38,5 @@ class ApplicationController < ActionController::Base
   private
 
 
-  def current_user
-    @current_user ||= User.find(session[:user_id]) if session[:user_id]
-  end
-
-  def authenticate_user!
-    unless current_user
-      flash[:error] = 'Log in to get to this page'
-      redirect_to log_in_path
-    end
-  end
-
-  def authenticate_admin!
-    unless admin?
-      flash[:error] = 'You dont have access to this page'
-      redirect_to root_url
-    end
-  end
 
 end

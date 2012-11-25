@@ -1,0 +1,33 @@
+- if @breadcrumbs
+  - @breadcrumbs[0..-2].each do |txt, path|
+    = link_to(h(txt), path)
+    >
+  = h(@breadcrumbs.last.first)
+%br
+  %br
+    %table.table.table-bordered
+      %tr
+        %th Forum
+        %th Topics
+        %th Posts
+        %th
+        %th
+      = form_tag ('/forums/search_posts'), :method => :get do
+        %p Search posts
+        = text_field_tag :search, params[:search]
+        = submit_tag "Filter", :class => "btn btn-primary"
+      - @forums.each do |forum|
+        %tr
+          %td
+            %h4= link_to forum.name, forum_topics_path(forum.id)
+            %small
+              = forum.description
+          %td= forum.topics.count
+          %td= forum.posts.count
+          - if can? :update, forum
+            %td= link_to 'Edit', edit_forum_path(forum)
+          - if can? :destroy, forum
+            %td= link_to 'Destroy', forum, method: :delete, data: { confirm: 'Are you sure?' }
+    %br/
+    - if can? :create, Forum
+      = link_to 'New Forum', new_forum_path

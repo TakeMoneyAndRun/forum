@@ -1,43 +1,29 @@
 class User < ActiveRecord::Base
 
+  # Include default devise modules. Others available are:
+  # :token_authenticatable, :confirmable,
+  # :lockable, :timeoutable and :omniauthable
+  devise :database_authenticatable, :registerable,
+          :rememberable, :trackable, :validatable
+
   mount_uploader :avatar, AvatarUploader
 
-  attr_accessible :email, :nickname, :password, :password_confirmation, :permission_level, :avatar, :avatar_cache, :remove_avatar
-  attr_accessor :password
-
-  before_save :encrypt_password
+  attr_accessible :email, :password, :nickname, :password_confirmation, :remember_me, :avatar, :avatar_cache, :remove_avatar, :role_ids, :roles
 
   has_many :posts
   has_many :topics
   has_many :bookmarks
   has_many :notes
   has_one :ban
+  has_many :users_roles
+  has_many :roles, :through => :users_roles
 
-  validates_confirmation_of :password
-  validates_presence_of :password, :on => :create
-  validates_presence_of :email, :nickname
-  validates_uniqueness_of :email, :nickname
+  scope :bannable, includes(:roles).where(:roles => {:id => 1})
 
 
-  def self.authenticate(email, password)
-    user = find_by_email(email)
-    if user && user.password_valid?(password)
-      user
-    else
-      nil
-    end
+  def has_role?(role_sym)
+    roles.any? { |r| r.name.underscore.to_sym == role_sym }
   end
 
-  def password_valid?(password)
-    password_hash == BCrypt::Engine.hash_secret(password, password_salt)
-  end
-
-
-  def encrypt_password
-    if password.present?
-      self.password_salt = BCrypt::Engine.generate_salt
-      self.password_hash = BCrypt::Engine.hash_secret(password, password_salt)
-    end
-  end
 
 end

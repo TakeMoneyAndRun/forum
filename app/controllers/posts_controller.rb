@@ -1,19 +1,18 @@
 class PostsController < ApplicationController
 
+  load_and_authorize_resource :forum
+  load_and_authorize_resource :topic, :through => :forum
+  load_and_authorize_resource :post, :through => :topic, :except => [:vote, :complain]
+
   before_filter :authenticate_user!
 
   def new
-    @forum = Forum.find(params[:forum_id])
-    @topic = Topic.find(params[:topic_id])
-    @post = @topic.posts.build
+
   end
 
   def create
     if Topic.exists?(params[:topic_id])
 
-      @forum = Forum.find(params[:forum_id])
-      @topic = Topic.find(params[:topic_id])
-      @post = @topic.posts.build(params[:post])
       @post.user = current_user
 
       if params[:reply]
@@ -36,12 +35,8 @@ class PostsController < ApplicationController
   end
 
   def edit
-    @post = Post.find_by_id(params[:id])
 
-    unless logged?(@post.user_id) || moderator? || admin?
-      flash[:error] = 'You dont have access to this page'
-      redirect_to root_url
-    end
+
 
     @topic = @post.topic
     @forum =  @topic.forum
@@ -49,12 +44,6 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = Post.find_by_id(params[:id])
-
-    unless logged?(@post.user_id) || moderator? || admin?
-      redirect_to root_url
-      flash[:error] = 'You dont have access to this page'
-    end
 
     if @post.update_attributes(params[:post])
       redirect_to forum_topic_path(params[:forum_id], params[:topic_id])
@@ -64,24 +53,19 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post = Post.find(params[:id])
 
-    if logged?(@post.user_id) || moderator? || admin?
       @post.body = 'Deleted'
       @post.save
 
       redirect_to forum_topic_path(params[:forum_id], params[:topic_id])
-    else
-      flash[:error] = 'You dont have access to this action'
-      redirect_to root_url
-    end
+
   end
 
   def vote
-    # можно вынести в отдельный метод
-    @post = Post.find(params[:id])
+    authenticate_user!
+   @post = Post.find(params[:id])
 
-    if Post.votes.where(user_id: :current_user.id).exists?
+    if @post.votes.where(user_id: current_user.id).exists?
       flash[:error] = "Sorry, you have already voted"
       redirect_to :back
     else
@@ -98,9 +82,10 @@ class PostsController < ApplicationController
   end
 
   def complain
+    authenticate_user!
     @post = Post.find(params[:id])
 
-    if Post.complains.where(user_id: :current_user.id).exists?
+    if @post.complains.where(user_id: current_user.id).exists?
       flash[:error] = "Sorry, you have already complained"
       redirect_to :back
     else
@@ -120,18 +105,19 @@ class PostsController < ApplicationController
   end
 
   def hide
-    authenticate_admin!
+    if current_user.has_role? :admin
+      @post = Post.find(params[:id])
+      @post.complained = false
 
-    @post = Post.find(params[:id])
-    @post.complained = false
-
-    if @post.save
-      redirect_to :back, :notice => "Hided successfully"
+      if @post.save
+        redirect_to :back, :notice => "Hided successfully"
+      else
+        flash[:error] = "Smth went wrong"
+        redirect_to :back
+      end
     else
-      flash[:error] = "Smth went wrong"
+      flash[:error] = "You dont have permission"
       redirect_to :back
     end
-
   end
-
 end

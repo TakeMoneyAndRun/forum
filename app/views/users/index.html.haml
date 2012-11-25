@@ -1,0 +1,42 @@
+%table.table
+  %tr
+    %th User id
+    %th Nickname
+    %th Permission level
+    %th
+    %th
+    %th
+    %th
+  - @users.each do |user|
+    %tr
+      %td= user.id
+      %td= user.nickname
+      %td
+        - if user.has_role? :admin
+          admin
+        - else
+          - if user.has_role? :moderator
+            moderator
+          - else
+            user
+      %td= link_to 'View profile', :action => :show, :id => user.id
+      - if  current_user.has_role?(:admin) && user.has_role?(:user) && !user.has_role?(:moderator)
+        %td= link_to 'Promote to moderator', promote_user_path(user), :method => :post
+      - if  current_user.has_role?(:admin) && user.has_role?(:moderator)
+        %td= link_to 'Demote', demote_user_path(user), :method => :post
+      %td
+        - if  !user.ban && current_user.has_role?(:admin) && !user.has_role?(:admin)
+          = form_for Ban.new, :url => ban_user_path(user) do |f|
+            %p
+              = f.label :reason
+              %br/
+              = f.text_field :reason
+            %p
+              = select_tag "time", options_for_select([["select" , "0" ], ["one day", "1"], ["three days", "3"], ["one week", "7"], ["forever", "500"]])
+            = f.submit :class => "btn btn-danger"
+      %td
+        - if  current_user.has_role?(:admin) && user.ban && user.ban.expires_at > DateTime.now.to_date
+          %p
+            Banned till #{user.ban.expires_at}. Reason : #{user.ban.reason}
+          = form_tag unban_user_path(user) do
+            = submit_tag "Unban", :class => "btn btn-success"

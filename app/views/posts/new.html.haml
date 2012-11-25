@@ -1,0 +1,18 @@
+%h1#page_title
+  Reply To #{@topic.name}
+= link_to @forum.name, forum_topics_path(@forum)
+= form_for(@post, :url => forum_topic_posts_path(:forum_id=>@forum.id, :topic_id=>@topic.id)) do |f|
+  - if @post.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@post.errors.count, "error")
+        prohibited this reply from being saved:
+      %ul
+        - @post.errors.full_messages.each do |msg|
+          %li= msg
+  %p
+    = f.label :body
+    %br/
+    = f.text_area(:body, :size => "60x10")
+  = f.submit "Reply", :name => "reply"
+  = f.submit "Save as note", :name => "note"

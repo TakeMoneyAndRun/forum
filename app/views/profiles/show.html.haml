@@ -1,0 +1,53 @@
+%table.table
+  %td
+    %h1
+      Profile (#{link_to 'Edit', edit_user_registration_path})
+    %br
+      %p
+        %strong Role
+        - if current_user.has_role? :admin
+          admin
+        - else
+          - if current_user.has_role? :moderator
+            moderator
+          - else
+            user
+      %p
+        %strong Nickname
+        = current_user.nickname
+      %p
+        %strong Email
+        = current_user.email
+      %p
+        %strong Avatar
+        = image_tag(current_user.avatar.thumb.url, :alt => "Avatar", :class => "avatar round") if current_user.avatar?
+      %p
+        %strong Topics
+        = current_user.topics.count
+      %p
+        %strong Posts
+        = current_user.posts.count
+      %p
+        %strong Rating
+        = current_user.posts.sum(:rating)
+  %td
+    My bookmarks:
+    - current_user.bookmarks.each do |bookmark|
+      %p
+        = link_to bookmark.topic.name, forum_topic_path(bookmark.topic.forum,bookmark.topic)
+        = link_to 'Delete from bookmarks', [current_user,bookmark], :confirm => 'Are you sure?', :method => :delete
+  %td
+    My notes:
+    - @notes.each do |note|
+      %p
+        = note.body
+  %td
+    Complained posts:
+    - @complains.each do |post|
+      %p
+        = post.id
+        = post.user.nickname
+        = post.created_at.to_formatted_s(:short)
+      %p
+        = link_to post.body, forum_topic_path(post.topic.forum,post.topic)
+      %p= link_to 'Hide', hide_forum_topic_post_path(post.topic.forum,post.topic,post), method: :post

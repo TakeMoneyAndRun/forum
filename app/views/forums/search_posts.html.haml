@@ -1,0 +1,30 @@
+%table.table
+  %tr
+    %th{:width => "300px"} User
+    %th Body
+  - @posts.each do |post|
+    %tr
+      %td
+        %p
+          %b
+            Nickname:#{link_to post.user.nickname, post.user}
+        %div{:style => "line-height: 4pt"}
+          %p
+            Role:
+            - if post.user.has_role? :admin
+              Admin
+            -else
+              - if post.user.has_role? :moderator
+                Moderator
+              - else
+                User
+          %p
+            Registration date:
+            \#{post.user.created_at.to_formatted_s(:long)}
+          %p
+            Posts::
+            \#{post.user.posts.count}
+      %td
+        %p= post.created_at.to_formatted_s(:short)
+        %p
+          = post.body

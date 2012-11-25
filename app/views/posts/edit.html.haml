@@ -1,0 +1,18 @@
+%h1 Editing post
+= link_to @forum.name, forum_topics_path(@forum)
+= form_for(@post, :url => forum_topic_post_path(@topic.forum,@topic, @post)) do |f|
+  - if @topic.errors.any?
+    #error_explanation
+      %h2
+        = pluralize(@topic.errors.count, "error")
+        prohibited this topic from being saved:
+      %ul
+        - @topic.errors.full_messages.each do |msg|
+          %li= msg
+  .field
+    = f.label :body
+    %br/
+    = f.text_area(:body, :size => "60x10")
+  .actions
+    = f.submit
+= link_to 'Back', [@topic.forum,@topic]

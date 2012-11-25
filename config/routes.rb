@@ -1,28 +1,21 @@
 App::Application.routes.draw do
 
-  post "profiles/change_pass"
+  devise_for :users, :skip => [:passwords]
+
   get "forums/search_posts"
 
-  scope controller: :sessions do
-    get "log_out" => :destroy, :as => "log_out"
-    get "log_in" => :new, :as => "log_in"
-  end
 
-  scope controller: :admins do
-    get "promote"
-    get "demote"
-  end
+  resources  :admins, :only => [:new, :create]
 
+  resource :profile, :only => :show
 
-  resources :sessions, :admins
-
-  resource :profile
-
-  resources :users, :path_names => {:new => "sign_up"}  do
+  resources :users, :only => [:index, :show]  do
     resources :bookmarks, :only => [:create, :destroy]
     member do
       post "ban" => :ban
       post "unban" => :unban
+      post "promote" => :promote
+      post "demote"  => :demote
     end
   end
 
@@ -37,8 +30,8 @@ App::Application.routes.draw do
       end
       member do
         post :move
-        post :close
-        post :open
+        get :close
+        get :open
       end
     end
   end

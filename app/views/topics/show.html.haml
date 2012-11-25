@@ -1,0 +1,64 @@
+%table.table
+  %tr
+    %th
+      %p
+        - if @breadcrumbs
+          - @breadcrumbs[0..-2].each do |txt, path|
+            = link_to(h(txt), path)
+            >
+          = h(@breadcrumbs.last.first)
+    %th
+      = form_tag forum_topic_path(@forum,@topic), :method => :get do
+        %p Search
+        = text_field_tag :search, params[:search]
+        = submit_tag "Filter", :class => "btn btn-primary"
+    %th
+      - if user_signed_in?
+        = form_tag user_bookmarks_path(current_user, :topic => @topic) do
+          = submit_tag "Add to bookmarks", :class => "btn btn-primary"
+%table.table
+  %tr
+    %th{:width => "300px"} User
+    %th Body
+  - @posts.each do |post|
+    %tr
+      %td
+        %p
+          %b
+            Nickname:#{link_to post.user.nickname, post.user}
+        %p
+          = image_tag(post.user.avatar.thumb.url, :alt => "Avatar", :class => "avatar round") if post.user.avatar?
+        %div{:style => "line-height: 4pt"}
+          %p
+            Registration date:
+            \#{post.user.created_at.to_formatted_s(:long)}
+          %p
+            Posts::
+            \#{post.user.posts.count}
+      %td
+        %p= post.created_at.to_formatted_s(:short)
+        %p
+          = post.body
+        - if user_signed_in?
+          = link_to 'Vote', vote_forum_topic_post_path(@forum,@topic,post), method: :post
+          = link_to 'Complain', complain_forum_topic_post_path(@forum,@topic,post), method: :post
+        - if can? :update, post
+          = link_to 'Edit', edit_forum_topic_post_path(@forum,@topic,post)
+        - if can? :destroy, post
+          = link_to 'Destroy', [@forum,@topic,post], :confirm => 'Are you sure?', :method => :delete
+= will_paginate @posts
+- if user_signed_in?
+  = link_to 'Reply', new_forum_topic_post_path(:forum=>@forum.id, :topic_id=>@topic.id)
+- else
+  = link_to 'Reply', new_user_session_path
+|
+- if user_signed_in? && current_user.has_role?(:admin)
+  - if @topic.closed?
+    = link_to 'Reopen topic', :action => :open, :forum_id => @forum.id, :id => @topic.id
+  - else
+    = link_to 'Close topic', :action => :close,  :forum_id => @forum.id, :id => @topic.id
+  = form_for :topic, url: move_forum_topic_path(@forum,@topic) do |f|
+    = f.collection_select :forum_id, @forums, :id, :name, {:include_blank => 'Please Select'}
+    = f.submit "Move topic", class: "btn btn-primary"
+
+= link_to 'Back', forum_topics_path

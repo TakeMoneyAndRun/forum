@@ -15,4 +15,7 @@ gem 'bootstrap-wysihtml5-rails'
 gem 'bcrypt-ruby', :require => 'bcrypt'
 gem 'carrierwave'
 gem 'mini_magick'
+gem 'devise'
+gem 'cancan'
+gem 'haml-rails'
 

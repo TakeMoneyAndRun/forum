@@ -1,21 +1,21 @@
 class ForumsController < ApplicationController
 
-  before_filter :authenticate_admin!, :except => [:index, :search_posts]
+  load_and_authorize_resource
 
   def index
-    @forums = Forum.all
+
   end
 
   def new
-    @forum = Forum.new
+
   end
 
   def edit
-    @forum = Forum.find(params[:id])
+
   end
 
   def create
-    @forum = Forum.new(params[:forum])
+
 
     if @forum.save
       redirect_to :action => :index
@@ -25,7 +25,7 @@ class ForumsController < ApplicationController
   end
 
   def update
-    @forum = Forum.find(params[:id])
+
 
     if @forum.update_attributes(params[:forum])
       redirect_to :action => :index
@@ -35,7 +35,7 @@ class ForumsController < ApplicationController
   end
 
   def destroy
-    @forum = Forum.find(params[:id])
+
     @forum.destroy
 
     redirect_to :action => :index

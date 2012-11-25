@@ -1,0 +1,24 @@
+%h3
+  = @user.nickname
+  's profile:
+%br
+  %p
+    = image_tag(@user.avatar.thumb.url, :alt => "Avatar", :class => "avatar round") if @user.avatar?
+  %p
+    %strong User id
+    = @user.id
+  %p
+    %strong Registration date
+    = @user.created_at.to_formatted_s(:long)
+  %p
+    %strong Nickname
+    = @user.nickname
+  %p
+    %strong Topics
+    = @user.topics.count
+  %p
+    %strong Posts
+    = @user.posts.count
+  %p
+    %strong Rating
+    = @user.posts.sum(:rating)
